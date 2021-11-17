@@ -1,0 +1,49 @@
+cd /c/ace-github/esl-infra-live/nonprod/dev/backend/04-esl-dev-ecs-api
+cd /root/ace-github/esl-infra-live/nonprod/dev/backend/04-esl-dev-ecs-api
+
+cd /c/ace-github/ace-aws-infra-modules/integration/api/lambda-authorizer/test/iam
+cd /c/ace-github/ace-aws-infra-modules/integration/api/lambda-authorizer/test/dydb
+cd /c/ace-github/ace-aws-infra-modules/integration/api/lambda-authorizer/test/access-token
+
+***** britive checkout "AWS-TMNA/831531666590 (955017_Sandbox_000001)/cloud-ops-admin-role" -a ace-sandbox
+
+britive checkout "AWS-TMNA/533309638091 (AWS_Admin)/cloud-ops-admin-role" -a tmna-org-master
+
+britive listprofiles | findstr "831531666590"
+britive checkout "AWS-TMNA/955017_Sandbox_000001/cloud-ops-admin-role" -a ace-sandbox
+
+britive listprofiles | findstr "919127553154"
+britive checkout "AWS-TMNA/builders_esl_nonprod/cloud-ops-admin-role" -a esl-nonprod
+
+
+set AWS_PROFILE=ace-sandbox
+set TERRAGRUNT_DOWNLOAD=C:\tg-temp
+
+export AWS_PROFILE=ace-sandbox
+export TERRAGRUNT_DOWNLOAD=/c/tg-temp
+export TF_DATA_DIR=/c/tf-temp
+export TF_LOG=DEBUG
+export TF_LOG=TRACE
+
+eval "$(ssh-agent -s)"
+ssh-add /c/Users/456586/.ssh/github_rsa
+    Github-Toyota
+ssh -T git@github.com
+
+# Terragrunt commands
+terragrunt init --terragrunt-source-update -lock=false
+terragrunt plan -lock=false 2>&1 | tee tg-plan.log
+terragrunt apply --auto-approve
+terragrunt destroy --auto-approve
+
+terragrunt init -backend-config=backend.tfvars
+terragrunt plan -var-file=variables.tfvars
+terragrunt apply -input=false -var-file=variables.tfvars --auto-approve
+terragrunt destroy -input=false -var-file=variables.tfvars --auto-approve
+
+# Terraform commands
+terraform init -backend-config=backend.tfvars -lock=false
+terraform plan -lock=false 2>&1 | tee tg-plan.log
+terraform apply --auto-approve
+terraform destroy --auto-approve
+

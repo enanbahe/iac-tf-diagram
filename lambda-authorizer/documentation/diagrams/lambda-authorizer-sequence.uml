@@ -1,0 +1,24 @@
+@startuml
+"End-User" -> Frontend: Start app
+activate Frontend
+Frontend -> "Azure-AD": I need a JWT
+activate "Azure-AD"
+"Azure-AD" -> "End-User": Please log in
+"End-User" -> "Azure-AD": Login credentials
+"Azure-AD" -> Frontend: Send JWT
+deactivate "Azure-AD"
+Frontend -> "API-Gateway": Get resource with JWT
+activate "API-Gateway"
+"API-Gateway" -> "Lambda-Authorizer": Validate JWT
+activate "Lambda-Authorizer"
+"Lambda-Authorizer" --> "API-Gateway": Policy (Allow/Deny)
+deactivate "Lambda-Authorizer"
+== Allowed ==
+"API-Gateway" -> Backend: Get resource
+activate Backend
+Backend --> "API-Gateway": Requested resource
+deactivate Backend
+"API-Gateway" --> Frontend: Requested resource
+deactivate "API-Gateway"
+deactivate Frontend
+@enduml
